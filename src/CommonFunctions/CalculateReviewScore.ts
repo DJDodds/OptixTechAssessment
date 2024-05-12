@@ -7,6 +7,6 @@ export const calculateReviewScore = (value: number[]) => {
     }
   
     const average = sum / count;
-    return parseFloat(average.toFixed(1))
+    return average.toFixed(1)
   };
   

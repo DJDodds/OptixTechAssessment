@@ -43,7 +43,7 @@ export const App = () => {
     {
       field: "reviews",
       headerName: "Review Score",
-      type: "number",
+      type: "string",
       valueGetter: calculateReviewScore,
     },
   ];
