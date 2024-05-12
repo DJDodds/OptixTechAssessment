@@ -3,31 +3,13 @@ import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { IMovie, IMovieCompany } from "./model";
 import { ReviewDialog } from "./Components/ReviewDialog";
 import { refreshButton } from "./Components/refreshButton";
-import { MoviesGrid } from "./Components/MoviesGrid";
-
-// TODO: use https://giddy-beret-cod.cyclic.app/movieCompanies
-// const mockMovieCompanyData: any = [
-//   {id: "1", name: "Test Productions"},
-// ];
-
-// // TODO: use https://giddy-beret-cod.cyclic.app/movies
-// const mockMovieData: any = [
-//   {id: "1", reviews: [6,8,3,9,8,7,8], title: "A Testing Film", filmCompanyId: "1", cost : 534, releaseYear: 2005},
-//   {id: "2", reviews: [5,7,3,4,1,6,3], title: "Mock Test Film", filmCompanyId: "1", cost : 6234, releaseYear: 2006},
-// ];
 
 export const App = () => {
-  const [open, setOpen] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState<IMovie | null>(null);
+  const [movies, setMovies] = useState<IMovie[]>([]);
+  const [movieCompanies, setMovieCompanies] = useState<IMovieCompany[]>([]);
+  const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    getData()
-  }, []);
-
-  const getData = ()=> {
-    getMoviesData();
-    getMovieCompaniesData();
-  }
   const getMoviesData = () => {
     fetch("http://192.168.0.12:3002/movies")
       .then((response) => {
@@ -60,13 +42,45 @@ export const App = () => {
       });
   };
 
-  const handleClose = () => {
-    setOpen(false);
+  useEffect(() => {
+    getData()
+  }, []);
+
+  const getData = ()=> {
+    getMoviesData();
+    getMovieCompaniesData();
+  }
+
+  const getCompanyById = (companyId: string) => {
+    const companyName = movieCompanies.find(
+      (company) => company.id == companyId
+    )?.name;
+    return companyName;
   };
+
+  const columns: GridColDef[] = [
+    { field: "title", headerName: "Title", type: "string" },
+    {
+      field: "filmCompanyId",
+      type: "string",
+      headerName: "Film Company",
+      valueGetter: getCompanyById,
+    },
+    {
+      field: "reviews",
+      headerName: "Review Score",
+      type: "number",
+      valueGetter: calculateReviewScore,
+    },
+  ];
 
   const selectRow = (event: any) => {
     setOpen(true);
     setSelectedMovie(event.row);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
   };
 
   return (
@@ -76,7 +90,20 @@ export const App = () => {
         <span>{refreshButton(getData)}</span>
       </div>
       <div style={{flex:"1 1 0"}}>
-        <MoviesGrid  />
+        <DataGrid
+          rows={movies}
+          columns={columns}
+          onRowClick={selectRow}
+          autosizeOnMount={true}
+          autoPageSize={true}
+          autosizeOptions={{
+            columns: ["title", "reviews", "filmCompanyId"],
+            includeHeaders: true,
+            includeOutliers: true,
+            outliersFactor: 1.5,
+            expand: true,
+          }}
+        />
         {selectedMovie && (
           <ReviewDialog
             selectedMovie={selectedMovie}

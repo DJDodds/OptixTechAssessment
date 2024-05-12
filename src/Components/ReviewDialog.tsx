@@ -35,7 +35,7 @@ export const ReviewDialog = (props: ReviewDialogProps) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(message),
+      body: JSON.stringify({review: message}),
     })
       .then(async (response) => {
         if (!response.ok) {
