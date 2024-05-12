@@ -34,7 +34,7 @@ export const ReviewDialog = (props: ReviewDialogProps) => {
     e.stopPropagation();
     try {
       const responseMessage= await sendMovieReview(message);
-      setResponseMessage({message:responseMessage, severity:"error"})
+      setResponseMessage({message:responseMessage, severity:"success"})
     } catch {
       setResponseMessage({message:"Failed to publish review", severity:"error"})
     }
@@ -51,7 +51,7 @@ export const ReviewDialog = (props: ReviewDialogProps) => {
           </IconButton>
       </div>
       
-      {responseMessage ? <div style={{minWidth:"400px"}}><Alert severity={responseMessage.severity == "success"? "success": "error"}>{responseMessage.message}</Alert></div>:  (
+      {responseMessage.message ? <div style={{minWidth:"400px"}}><Alert severity={responseMessage.severity == "success" ? "success": "error"}>{responseMessage.message}</Alert></div>:  (
         <>
           <textarea
             id="message"
