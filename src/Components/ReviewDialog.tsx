@@ -2,7 +2,7 @@ import Button from "@mui/material/Button";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
 import { IMovie } from "../model";
-import { Alert, IconButton } from "@mui/material";
+import { Alert, AlertPropsColorOverrides, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { ChangeEvent, useState } from "react";
 import { sendMovieReview } from "../CommonFunctions/sendMovieReview";
@@ -17,7 +17,8 @@ export const ReviewDialog = (props: ReviewDialogProps) => {
   const { open, selectedMovie } = props;
 
   const [message, setMessage] = useState("");
-  const [responseMessage, setResponseMessage ] = useState("")
+  const [responseMessage, setResponseMessage ] = useState<{message: string, severity: string}>({message: "", severity:"success"})
+
 
   const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value.slice(0, 100));
@@ -25,13 +26,18 @@ export const ReviewDialog = (props: ReviewDialogProps) => {
 
   const handleClose = () => {
     setMessage("");
-    setResponseMessage("");
+    setResponseMessage({message: "", severity:"success"});
     props.onClose();
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    sendMovieReview(message, setResponseMessage);
+    try {
+      const responseMessage= await sendMovieReview(message);
+      setResponseMessage({message:responseMessage, severity:"error"})
+    } catch {
+      setResponseMessage({message:"Failed to publish review", severity:"error"})
+    }
   };
 
   return (
@@ -45,7 +51,7 @@ export const ReviewDialog = (props: ReviewDialogProps) => {
           </IconButton>
       </div>
       
-      {responseMessage ? <div style={{minWidth:"400px"}}><Alert severity="success">{responseMessage}</Alert></div>:  (
+      {responseMessage ? <div style={{minWidth:"400px"}}><Alert severity={responseMessage.severity == "success"? "success": "error"}>{responseMessage.message}</Alert></div>:  (
         <>
           <textarea
             id="message"

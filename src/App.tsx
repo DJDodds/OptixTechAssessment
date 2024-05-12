@@ -18,9 +18,11 @@ export const App = () => {
     getData()
   }, []);
 
-  const getData = ()=> {
-    getMoviesData(setMovies);
-    getMovieCompaniesData(setMovieCompanies);
+  const getData = async ()=> {
+    const movies = await getMoviesData();
+    const movieCompanies = await getMovieCompaniesData();
+    setMovies(movies);
+    setMovieCompanies(movieCompanies);
   }
 
   const getCompanyById = (companyId: string) => {
