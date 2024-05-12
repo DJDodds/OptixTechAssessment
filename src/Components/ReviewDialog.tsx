@@ -1,10 +1,11 @@
-import * as React from "react";
 import Button from "@mui/material/Button";
 import DialogTitle from "@mui/material/DialogTitle";
 import Dialog from "@mui/material/Dialog";
 import { IMovie } from "../model";
 import { Alert, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { ChangeEvent, useState } from "react";
+import { sendMovieReview } from "../CommonFunctions/sendMovieReview";
 
 export interface ReviewDialogProps {
   open: boolean;
@@ -15,10 +16,10 @@ export interface ReviewDialogProps {
 export const ReviewDialog = (props: ReviewDialogProps) => {
   const { open, selectedMovie } = props;
 
-  const [message, setMessage] = React.useState("");
-  const [responseMessage, setResponseMessage ] = React.useState("")
+  const [message, setMessage] = useState("");
+  const [responseMessage, setResponseMessage ] = useState("")
 
-  const handleChange = (event: any) => {
+  const handleChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(event.target.value.slice(0, 100));
   };
 
@@ -28,30 +29,14 @@ export const ReviewDialog = (props: ReviewDialogProps) => {
     props.onClose();
   };
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
-    fetch("http://192.168.0.12:3002/submitReview", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({review: message}),
-    })
-      .then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        const json = await response.json();
-        setResponseMessage(json.message)
-      })
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-      });
+    sendMovieReview(message, setResponseMessage);
   };
 
   return (
     <Dialog onClose={handleClose} open={open}>
-      <div style={{ display: "flex",alignItems: "center" }}>
+      <div style={{ display: "flex",alignItems: "center", width:"85%" }}>
         <DialogTitle className="dialogTitle">
           {"Review " + selectedMovie.title}
         </DialogTitle>
@@ -66,12 +51,7 @@ export const ReviewDialog = (props: ReviewDialogProps) => {
             id="message"
             name="message"
             rows={4}
-            style={{
-              minWidth: "calc(25vw - 20px)",
-              boxSizing: "border-box",
-              margin: "10px",
-              height:"200px"
-            }}
+            className={"reviewTextbox"}
             maxLength={100}
             value={message}
             onChange={handleChange}

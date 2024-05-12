@@ -12,9 +12,35 @@ body {
   padding: 0;
 }
 
-.textArea textarea{ 
-  background: red
+.reviewTextbox{
+  min-width: calc(25vw - 20px);
+  box-sizing: border-box;
+  margin: 10px;
+  height:200px;
 }
+
+.reviewTextbox {
+  box-sizing: border-box;
+  margin: 10px;
+  height: 200px;
+}
+
+.reviewTextbox {
+  min-width: calc(25vw - 20px);
+}
+
+@media only screen and (min-width: 768px) {
+  .reviewTextbox {
+    min-width: calc(20vw - 20px);
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .reviewTextbox {
+    min-width: calc(15vw - 20px);
+  }
+}
+
 .submitButton{
   display: flex;
   padding: 5px;

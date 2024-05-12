@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRowParams } from "@mui/x-data-grid";
 import { IMovie, IMovieCompany } from "./model";
 import { ReviewDialog } from "./Components/ReviewDialog";
-import { refreshButton } from "./Components/refreshButton";
+import { refreshButton } from "./Components/RefreshButton";
+import { calculateReviewScore } from "./CommonFunctions/CalculateReviewScore";
+import { getMovieCompaniesData } from "./CommonFunctions/getMovieCompanies";
+import { getMoviesData } from "./CommonFunctions/getMoviesData";
 
 export const App = () => {
   const [selectedMovie, setSelectedMovie] = useState<IMovie | null>(null);
@@ -10,45 +13,14 @@ export const App = () => {
   const [movieCompanies, setMovieCompanies] = useState<IMovieCompany[]>([]);
   const [open, setOpen] = useState(false);
 
-  const getMoviesData = () => {
-    fetch("http://192.168.0.12:3002/movies")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data: IMovie[]) => {
-        setMovies(data);
-      })
-      .catch((error) => {
-        console.error("Failed to get the movie data: ", error);
-      });
-  };
-
-  const getMovieCompaniesData = () => {
-    fetch("http://192.168.0.12:3002/movieCompanies")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return response.json();
-      })
-      .then((data: IMovieCompany[]) => {
-        setMovieCompanies(data);
-      })
-      .catch((error) => {
-        console.error("Failed to get the movie company data: ", error);
-      });
-  };
 
   useEffect(() => {
     getData()
   }, []);
 
   const getData = ()=> {
-    getMoviesData();
-    getMovieCompaniesData();
+    getMoviesData(setMovies);
+    getMovieCompaniesData(setMovieCompanies);
   }
 
   const getCompanyById = (companyId: string) => {
@@ -74,9 +46,9 @@ export const App = () => {
     },
   ];
 
-  const selectRow = (event: any) => {
+  const selectRow = (params: GridRowParams) => {
     setOpen(true);
-    setSelectedMovie(event.row);
+    setSelectedMovie(params.row);
   };
 
   const handleClose = () => {
